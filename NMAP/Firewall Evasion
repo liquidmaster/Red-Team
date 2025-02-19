@@ -1,0 +1,150 @@
+Puertos TCP:
+21 (FTP) – Protocolo de transferencia de archivos.
+22 (SSH) – Secure Shell, para acceso remoto seguro.
+23 (Telnet) – Protocolo de comunicación para terminal remoto (no seguro).
+25 (SMTP) – Protocolo de transferencia de correo.
+53 (DNS) – Sistema de nombres de dominio.
+69 (TFTP) – Trivial File Transfer Protocol (FTP simplificado y sin seguridad).
+80 (HTTP) – Protocolo de transferencia de hipertexto (web).
+110 (POP3) – Protocolo de oficina de correos (recepción de correo).
+143 (IMAP) – Protocolo de acceso a mensajes de Internet (correo).
+161 (SNMP) – Protocolo simple de administración de red.
+162 (SNMP Trap) – Usado para recibir noƟficaciones de eventos SNMP.
+443 (HTTPS) – HTTP seguro (web).
+445 (MicrosoŌ-DS) – ComparƟción de archivos e impresión en Windows.
+5080 (HTTP Proxy) – Protocolo de servidor proxy web alternaƟvo.
+5432 (PostgreSQL) – Base de datos PostgreSQL.
+5900 (VNC) – Protocolo de acceso a escritorio remoto (Virtual Network CompuƟng).
+8080 (HTTP Proxy) – Servidor web alternaƟvo, generalmente usado para proxies HTTP.
+8081 (HTTP Proxy) – Otro puerto para proxies HTTP alternaƟvos.
+11211 (Memcached) – Servicio de almacenamiento en caché distribuido.
+1433 (MS SQL Server) – Protocolo de MicrosoŌ SQL Server.
+1521 (Oracle DB) – Base de datos Oracle.
+2049 (NFS) – Sistema de archivos de red de UNIX.
+27017 (MongoDB) – Base de datos MongoDB.
+3389 (RDP) – Protocolo de escritorio remoto de MicrosoŌ.
+50000 (SAP) – Sistema de aplicaciones empresariales SAP.
+9100 (Printer Services) – Usado por impresoras y servicios de impresión en red.
+1521 (Oracle DB) – Base de datos Oracle.
+2000 (Cisco SCCP) – Protocolo de control de llamadas en sistemas de Cisco.
+
+Puertos UDP:
+53 (DNS) – Protocolo de nombres de dominio (resolución de nombres).
+67 (DHCP) – Protocolo de configuración dinámica de host, uƟlizado para asignar
+direcciones IP automáƟcamente.
+68 (DHCP) – Usado por clientes DHCP para recibir respuestas del servidor.
+69 (TFTP) – Trivial File Transfer Protocol (FTP simplificado y sin seguridad).
+123 (NTP) – Protocolo de Ɵempo de red (para sincronización de Ɵempo).
+137 (NetBIOS Name Service) – Servicio de nombres NetBIOS, uƟlizado para comparƟr
+archivos e impresoras en redes locales.
+138 (NetBIOS Datagram Service) – Servicio de datagramas NetBIOS para comparƟr
+archivos.
+139 (NetBIOS Session Service) – Protocolo de sesión NetBIOS para comparƟr archivos e
+impresoras.
+161 (SNMP) – Protocolo simple de administración de red.
+162 (SNMP Trap) – Usado para recibir noƟficaciones de eventos SNMP.
+1812 (RADIUS) – Protocolo para autenƟcación remota, uƟlizado principalmente para
+acceso a redes VPN.
+2000 (Cisco SCCP) – Usado para el protocolo de control de llamadas en disposiƟvos
+Cisco.
+4500 (IPsec NAT-T) – Usado para la negociación de túneles IPsec en redes NAT.
+500 (ISAKMP) – Protocolo de administración de claves para IPSec (usado en VPN).
+514 (Syslog) – Protocolo para el envío de logs y mensajes de sistema.
+5060 (SIP) – Protocolo de iniciación de sesión, uƟlizado para VoIP (llamadas de voz por
+Internet).
+5061 (SIP TLS) – Protocolo de iniciación de sesión sobre TLS para comunicaciones
+seguras en VoIP.
+1701 (L2TP) – Protocolo de túnel de capa 2, uƟlizado en conexiones VPN.
+
+
+1. Fragmentación de paquetes
+Dividir datos en paquetes más pequeños puede confundir al firewall, dificultando la
+inspección completa del tráfico.
+nmap -f (fragmentos) --mtu (MTU especificada) -p <puerto> <objeƟvo>
+
+2. Puerto de origen
+Un error de configuración común es confiar en el tráfico basándose únicamente en el
+número de puerto de origen. Las respuestas DNS provienen del puerto 53 y muchos
+administradores han caído en la trampa de simplemente permiƟr el tráfico entrante
+desde esos puertos.
+nmap -g 53 -p <puerto> <objeƟvo>
+
+3. Falsificación de direcciones MAC
+Falsificar la dirección MAC ofrece otro método para eludir las restricciones del firewall.
+Este enfoque puede ser parƟcularmente potente, en parƟcular cuando un firewall
+emplea filtrado MAC para permiƟr la comunicación exclusivamente desde direcciones
+MAC designadas.
+nmap -sT -PO -spoof-mac <mac> -p <puerto> <objeƟvo>
+
+4. Escaneo con orden aleatorio / ofuscación
+Los firewalls y sistemas IDS/IPS pueden detectar patrones de tráfico constante.
+Modificar el orden de los hosts y el Ɵempo de escaneo de puertos puede dificultar la
+detección. Además, alterar los datos de los paquetes para que no coincidan con los
+patrones esperados de tráfico puede ayudar a evadir.
+nmap --data-length 100 --randomize-hosts -p <puerto> <objeƟvos>
+
+5. Escaneo UDP (para evitar los filtros de puertos TCP comunes)
+A veces los firewalls están configurados para bloquear puertos TCP comunes, pero no
+filtran adecuadamente el tráfico UDP.
+nmap -sU -p <puerto> <objeƟvo>
+
+6. Escaneo con Túneles ICMP (ICMP Echo Scan)
+Este Ɵpo de escaneo es úƟl cuando se sospecha que el firewall bloquea los puertos TCP
+y UDP, pero permite el tráfico ICMP. El comando ICMP puede usarse para enviar
+paquetes "ping" al objeƟvo.
+nmap -PE -p <puerto> <objeƟvo>
+
+7. Escaneo con Opciones de Spoofing de IP (Evitar Detección por IP de Origen):
+ Este Ɵpo de escaneo hace que parezca que los paquetes vienen de una IP diferente, lo
+que puede eludir los filtros basados en direcciones IP. Sin embargo, para obtener
+respuestas úƟles sobre los puertos abiertos en los objeƟvos, necesitarías emplear
+técnicas adicionales, como redirección de tráfico a través de un proxy o uƟlizar
+métodos.
+nmap n -S <ip falsa> -p <puerto> <objeƟvo>
+
+8. Escaneo a Baja Velocidad (-T0, --scan-delay, --max-retries)
+Al ajustar la demora entre los paquetes, puedes hacer que tu escaneo sea más diİcil de
+detectar especificando un retraso más preciso.
+nmap -T0 --scan-delay 1s --max-retries 1 -p <puerto> <objeƟvo>
+
+9. Escanear empleado proxies
+Esto puede ser úƟl cuando deseas realizar un escaneo sin exponer tu IP real, uƟlizando
+un servidor proxy como intermediario.
+nmap --proxies <proto://host:port > <puerto> <objeƟvos>
+
+10. Enviar sumas de verificación incorrectas
+Las sumas de verificación son fundamentales en el protocolo TCP/IP para garanƟzar la
+integridad de los datos durante la transmisión. Sin embargo, enviar deliberadamente
+paquetes con sumas de verificación incorrectas puede resultar ventajoso en
+determinados escenarios.
+nmap --badsum <puerto> <objeƟvo>
+
+11. Escaneo con señuelos (Decoy Scan)
+Un escaneo con señuelos es una técnica de escaneo de puertos que hace parecer que
+los hosts especificados como señuelos están escaneando una red objeƟvo.
+nmap -p <puerto> <objeƟvo> -D <señuelos>
+
+12. Escaneo Idle Scan empleando “zombis inacƟvos”
+La técnica de escaneo de zombis inacƟvos es un método sofisƟcado que se emplea en
+las evaluaciones de seguridad de la red para realizar escaneos de puertos en los hosts
+de desƟno uƟlizando hosts inacƟvos dentro de la red. Su principal ventaja reside en su
+notable sigilo, ya que oculta el origen del escaneo al atribuir la dirección IP del host
+"zombi" inacƟvo en los archivos de registro del cortafuegos, ocultando así la idenƟdad
+del escáner real.
+Para garanƟzar resultados precisos, es imperaƟvo idenƟficar los hosts inacƟvos dentro
+de la red. Existen diversas herramientas para idenƟficar un “zoombie”.
+nmap -sI <zoombie> -p <puerto> <objeƟvo>
+Ejemplos empleando usuario con privilegios administraƟvos para emplear -sS (por
+defecto en nmap):
+
+Escaneo básico con opciones avanzadas:
+nmap -p 22,80,443 --scan-delay 1s --max-retries 1 --mtu 1280 --proxies
+hƩp://proxy.example.com:8080 -f <objeƟvo>
+Escaneo de alta evasión con decoys, retraso y suma incorrecta
+nmap -T0 -p 22,80,443 --decoy 192.168.1.10,192.168.1.20,192.168.1.30 --badsum
+192.168.1.0/24
+
+Escaneo avanzado con spoofing, proxies y otras opciones de evasión
+nmap -S 192.168.100.1 --data-length 100 --randomize-hosts -p 22,80,443 --scan-delay
+1s --max-retries 1 --mtu 1280 --source-mac 00:11:22:33:44:55 --proxies
+hƩp://proxy.example.com:8080 -f 192.168.1.0/24 
